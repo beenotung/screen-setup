@@ -39,7 +39,7 @@ export function getCurrentConfig(): Config {
 
   for (let match of matches) {
     let name = match[0].match(/\w+/)?.[0]
-    let [_, w, h, x, y] = match[0].match(/(\d+)x(\d+)+(\d+)+(\d+)/) || []
+    let [_, w, h, x, y] = match[0].match(/(\d+)x(\d+)\+(\d+)\+(\d+)/) || []
     let screen = screenParser.parse({ name, w, h, x, y })
     screens.push(screen)
   }
