@@ -1,6 +1,6 @@
 import express from 'express'
 import { print } from 'listening-on'
-import { loadConfigs, getCurrentConfig, saveConfigs } from './core'
+import { loadConfigs, getCurrentConfig, saveConfigs, applyConfig } from './core'
 
 let app = express()
 
@@ -20,6 +20,11 @@ app.get('/current-config', (req, res) => {
 
 app.post('/configs', (req, res) => {
   saveConfigs(req.body)
+  res.json({})
+})
+
+app.post('/config/apply', (req, res) => {
+  applyConfig(req.body)
   res.json({})
 })
 

@@ -60,3 +60,10 @@ export function saveConfigs(configs: Configs) {
   let text = JSON.stringify(configsParser.parse(configs), null, 2)
   storage.setItem('configs', text)
 }
+
+export function applyConfig(config: Config) {
+  config = configParser.parse(config)
+  config.screens.forEach(({ name, w, h, x, y }) => {
+    execSync(`xrandr --output ${name} --mode ${w}x${h} --pos ${x}x${y}`)
+  })
+}

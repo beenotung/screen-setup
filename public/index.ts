@@ -6,6 +6,20 @@ let configListMessage = p()
 
 let configs: Config[] | undefined
 
+async function applyConfig(config: Config, applyMessage: HTMLParagraphElement) {
+  try {
+    let res = await fetch('/config/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config),
+    })
+    let json = await res.json()
+    applyMessage.textContent = `Applied config (${new Date().toLocaleTimeString()})`
+  } catch (error) {
+    applyMessage.textContent = String(error)
+  }
+}
+
 function ConfigNode(config: Config) {
   let totalHeight = 0
   let totalWidth = 0
@@ -14,6 +28,7 @@ function ConfigNode(config: Config) {
     totalWidth = Math.max(totalWidth, screen.x + screen.w)
   })
   let scale = 1 / 10
+  let applyMessage = p()
   return div(
     {
       style: {
@@ -87,6 +102,11 @@ function ConfigNode(config: Config) {
         )
       }),
       h4({ textContent: 'Preview', style: { margin: '0.5rem 0' } }),
+      button({
+        textContent: 'Apply',
+        onclick: () => applyConfig(config, applyMessage),
+      }),
+      applyMessage,
       div(
         {
           style: {
