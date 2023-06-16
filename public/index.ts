@@ -1,4 +1,4 @@
-import { button, div, fragment, h1, h2, h3, h4, p, text } from 'dom-proxy'
+import { button, div, fragment, h1, h2, h3, h4, input, p } from 'dom-proxy'
 import type { Config, Configs } from '../core.js'
 
 let configList = div()
@@ -7,6 +7,13 @@ let configListMessage = p()
 let configs: Config[] | undefined
 
 function ConfigNode(config: Config) {
+  let totalHeight = 0
+  let totalWidth = 0
+  config.screens.forEach(screen => {
+    totalHeight = Math.max(totalHeight, screen.y + screen.h)
+    totalWidth = Math.max(totalWidth, screen.x + screen.w)
+  })
+  let scale = 1 / 10
   return div(
     {
       style: {
@@ -17,7 +24,48 @@ function ConfigNode(config: Config) {
       },
     },
     [
-      h3({ textContent: 'Profile: ' + config.profile_name }),
+      h3(
+        {
+          textContent: 'Profile: ',
+          style: {
+            marginTop: '0.5rem',
+            marginBottom: '0.5rem',
+          },
+        },
+        [
+          input({
+            value: config.profile_name,
+            oninput: e =>
+              (config.profile_name = (
+                e.currentTarget as HTMLInputElement
+              ).value),
+          }),
+        ],
+      ),
+      div({}, [
+        button({
+          textContent: 'Save',
+          onclick: saveConfigs,
+          style: {
+            marginLeft: '0.5rem',
+            marginRight: '0.5rem',
+            color: 'darkgreen',
+          },
+        }),
+        button({
+          textContent: 'Delete',
+          onclick: () => {
+            if (!configs) return
+            let index = configs.indexOf(config)
+            if (index === -1) return
+            configs.splice(index, 1)
+            saveConfigs()
+          },
+          style: {
+            color: 'red',
+          },
+        }),
+      ]),
       ...config.screens.map(({ name, w, h, x, y }) => {
         return div(
           {
@@ -25,15 +73,53 @@ function ConfigNode(config: Config) {
               display: 'inline-block',
               border: '1px solid black',
               padding: '0.5rem',
+              paddingTop: '0',
               margin: '0.5rem',
             },
           },
           [
-            h4({ textContent: 'Screen: ' + name }),
+            h4({
+              textContent: 'Screen: ' + name,
+              style: { margin: '0.5rem 0' },
+            }),
             div({ textContent: `${w}x${h}+${x}+${y}` }),
           ],
         )
       }),
+      h4({ textContent: 'Preview', style: { margin: '0.5rem 0' } }),
+      div(
+        {
+          style: {
+            border: '1px solid black',
+            margin: '0.5rem',
+            width: totalWidth * scale + 'px',
+            height: totalHeight * scale + 'px',
+            position: 'relative',
+            backgroundColor: '#666666',
+          },
+        },
+        config.screens.map(screen => {
+          return div(
+            {
+              style: {
+                position: 'absolute',
+                width: screen.w * scale + 'px',
+                height: screen.h * scale + 'px',
+                top: screen.y * scale + 'px',
+                left: screen.x * scale + 'px',
+                border: '1px solid black',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontSize: '2rem',
+                backgroundColor: '#ffffff88',
+                userSelect: 'none',
+              },
+            },
+            [screen.name],
+          )
+        }),
+      ),
     ],
   )
 }
