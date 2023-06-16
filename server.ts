@@ -5,7 +5,7 @@ import { loadConfigs, getCurrentConfig, saveConfigs, applyConfig } from './core'
 
 let app = express()
 
-console.log(join(__dirname, 'public'))
+console.log(join(__dirname, '.db'))
 app.use(express.static(join(__dirname, 'public')))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
