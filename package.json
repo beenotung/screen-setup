@@ -33,5 +33,13 @@
     "dom-proxy": "^2.0.1",
     "express": "^4.18.2",
     "listening-on": "^2.0.9"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beenotung/screen-setup.git"
+  },
+  "bugs": {
+    "url": "https://github.com/beenotung/screen-setup/issues"
+  },
+  "homepage": "https://github.com/beenotung/screen-setup#readme"
 }
