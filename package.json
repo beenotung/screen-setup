@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "screen-setup-server": "dist/server.js"
+  },
   "scripts": {
     "start": "run-p server dev",
     "server": "ts-node-dev server.ts",
-    "dev": "npm run build -- --watch",
-    "build": "esbuild --bundle --outfile=public/index.js public/index.ts ",
-    "test": "tsc --noEmit",
-    "tsc": "tsc -p ."
+    "dev": "npm run build:client -- --watch",
+    "build": "run-s build:*",
+    "build:client": "esbuild --bundle --outfile=public/index.js public/index.ts ",
+    "build:server": "tsc -p tsconfig.build.json && mkdir -p dist/public && cp public/index.{html,js} dist/public/",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [],
   "author": "",

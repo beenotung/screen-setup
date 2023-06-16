@@ -1,10 +1,12 @@
 import express from 'express'
 import { print } from 'listening-on'
+import { join } from 'path'
 import { loadConfigs, getCurrentConfig, saveConfigs, applyConfig } from './core'
 
 let app = express()
 
-app.use(express.static('public'))
+console.log(join(__dirname, 'public'))
+app.use(express.static(join(__dirname, 'public')))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
