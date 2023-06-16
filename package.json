@@ -7,6 +7,7 @@
     "screen-setup-server": "dist/server.js"
   },
   "scripts": {
+    "test": "tsc -p . --noEmit",
     "start": "run-p server dev",
     "server": "ts-node-dev server.ts",
     "dev": "npm run build:client -- --watch",
