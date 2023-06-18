@@ -4,6 +4,8 @@ Setup screens position from saved profiles
 
 [![npm Package Version](https://img.shields.io/npm/v/screen-setup)](https://www.npmjs.com/package/screen-setup)
 
+![screenshot](./screenshot.png)
+
 ## Installation
 
 ```bash
