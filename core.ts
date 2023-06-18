@@ -2,6 +2,8 @@ import { array, int, object, string } from 'cast.ts'
 import { execSync } from 'child_process'
 import { getLocalStorage } from '@beenotung/tslib/store'
 import { join } from 'path'
+import { mkdirSync } from 'fs'
+import { storageDir } from './config'
 
 export type Configs = Config[]
 
@@ -47,7 +49,7 @@ export function getCurrentConfig(): Config {
   return { profile_name: 'current', screens }
 }
 
-let storage = getLocalStorage(join(__dirname, '.db'))
+let storage = getLocalStorage(storageDir)
 
 export function loadConfigs(): Configs {
   try {

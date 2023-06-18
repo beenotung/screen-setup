@@ -1,11 +1,12 @@
 import express from 'express'
 import { print } from 'listening-on'
 import { join } from 'path'
+import { getPort, storageDir } from './config'
 import { loadConfigs, getCurrentConfig, saveConfigs, applyConfig } from './core'
 
 let app = express()
 
-console.log(join(__dirname, '.db'))
+console.log('config dir:', storageDir)
 app.use(express.static(join(__dirname, 'public')))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
@@ -30,7 +31,9 @@ app.post('/config/apply', (req, res) => {
   res.json({})
 })
 
-let port = 8456
-app.listen(port, () => {
-  print(port)
+getPort().then(port => {
+  let server = app.listen(port, () => {
+    let address = server.address() as any
+    print(address.port)
+  })
 })
