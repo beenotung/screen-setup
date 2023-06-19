@@ -1,9 +1,7 @@
 import { array, int, object, string } from 'cast.ts'
 import { execSync } from 'child_process'
-import { getLocalStorage } from '@beenotung/tslib/store'
-import { join } from 'path'
-import { mkdirSync } from 'fs'
-import { storageDir } from './config'
+import { getLocalStorage } from '@beenotung/tslib/store.js'
+import { storageDir } from './config.js'
 
 export type Configs = Config[]
 

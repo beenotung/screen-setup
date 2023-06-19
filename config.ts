@@ -1,5 +1,6 @@
 import { join } from 'path'
 import { createServer } from 'net'
+import { fileURLToPath } from 'url'
 
 export let storageDir = join(
   process.env.HOME || '~',
@@ -7,7 +8,11 @@ export let storageDir = join(
   'screen-setup',
   '.db',
 )
-// mkdirSync(storageDir)
+
+export let publicDir = join(
+  fileURLToPath(new URL('.', import.meta.url)),
+  'public',
+)
 
 export function getPort() {
   return new Promise<number>((resolve, reject) => {

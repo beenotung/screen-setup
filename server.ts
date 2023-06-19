@@ -1,13 +1,21 @@
 import express from 'express'
 import { print } from 'listening-on'
-import { join } from 'path'
-import { getPort, storageDir } from './config'
-import { loadConfigs, getCurrentConfig, saveConfigs, applyConfig } from './core'
+import { getPort, storageDir, publicDir } from './config.js'
+import {
+  loadConfigs,
+  getCurrentConfig,
+  saveConfigs,
+  applyConfig,
+} from './core.js'
+import open from 'open'
+
+console.log('config dir:', storageDir)
+// console.log('public dir:', publicDir)
 
 let app = express()
 
-console.log('config dir:', storageDir)
-app.use(express.static(join(__dirname, 'public')))
+app.use(express.static(publicDir))
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
@@ -34,6 +42,8 @@ app.post('/config/apply', (req, res) => {
 getPort().then(port => {
   let server = app.listen(port, () => {
     let address = server.address() as any
-    print(address.port)
+    port = address.port
+    print(port)
+    open('http://localhost:' + port)
   })
 })
