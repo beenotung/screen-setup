@@ -16,7 +16,15 @@
     "build:server": "tsc -p tsconfig.build.json && mkdir -p dist/public && cp public/index.{html,js} dist/public/",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [],
+  "keywords": [
+    "x11",
+    "xorg",
+    "xrandr",
+    "screen",
+    "setup",
+    "cli",
+    "web-ui"
+  ],
   "author": {
     "name": "Beeno Tung",
     "email": "aabbcc1241@yahoo.com.hk",
