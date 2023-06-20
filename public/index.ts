@@ -197,9 +197,20 @@ async function saveConfigs() {
   }
 }
 
+let stopServerMessage = p()
+async function stopServer() {
+  stopServerMessage.textContent = 'stopping server...'
+  let res = await fetch('/server/stop', { method: 'POST' })
+  let json = await res.json()
+  stopServerMessage.textContent = 'stopped server.'
+  window.close()
+}
+
 document.body.appendChild(
   fragment([
     h1({ textContent: 'Screen Setup' }),
+    button({ textContent: 'Stop Server', onclick: stopServer }),
+    stopServerMessage,
     h2({ textContent: 'Config List' }, [
       button({
         style: { marginInlineStart: '0.5rem' },
