@@ -1,7 +1,7 @@
 {
   "name": "screen-setup",
   "type": "module",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Setup screens position from saved profiles",
   "bin": {
     "screen-setup-server": "dist/server.js"
