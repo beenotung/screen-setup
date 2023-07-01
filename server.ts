@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import express from 'express'
 import { print } from 'listening-on'
 import { getPort, storageDir, publicDir } from './config.js'
