@@ -2,7 +2,7 @@ import { array, int, object, string } from 'cast.ts'
 import { execSync } from 'child_process'
 import { getLocalStorage } from '@beenotung/tslib/store.js'
 import { storageDir } from './config.js'
-import { compare } from '@beenotung/tslib/compare'
+import { compare } from '@beenotung/tslib/compare.js'
 
 export type Configs = Config[]
 
