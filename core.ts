@@ -2,6 +2,7 @@ import { array, int, object, string } from 'cast.ts'
 import { execSync } from 'child_process'
 import { getLocalStorage } from '@beenotung/tslib/store.js'
 import { storageDir } from './config.js'
+import { compare } from '@beenotung/tslib/compare'
 
 export type Configs = Config[]
 
@@ -51,7 +52,10 @@ let storage = getLocalStorage(storageDir)
 
 export function loadConfigs(): Configs {
   try {
-    return configsParser.parse(JSON.parse(storage.getItem('configs') || ''))
+    let configs = configsParser.parse(
+      JSON.parse(storage.getItem('configs') || ''),
+    )
+    return configs.sort((a, b) => compare(a.profile_name, b.profile_name))
   } catch (error) {
     return []
   }
