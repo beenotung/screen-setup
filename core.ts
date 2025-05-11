@@ -1,4 +1,4 @@
-import { array, int, object, string } from 'cast.ts'
+import { array, int, object, optional, string } from 'cast.ts'
 import { execSync } from 'child_process'
 import { getLocalStorage } from '@beenotung/tslib/store.js'
 import { storageDir } from './config.js'
@@ -9,6 +9,7 @@ export type Configs = Config[]
 export type Config = {
   profile_name: string
   screens: Screen[]
+  last_applied?: number
 }
 
 export type Screen = {
@@ -30,6 +31,7 @@ let screenParser = object({
 let configParser = object({
   profile_name: string({ nonEmpty: true }),
   screens: array(screenParser),
+  last_applied: optional(int()),
 })
 
 let configsParser = array(configParser)
@@ -55,7 +57,11 @@ export function loadConfigs(): Configs {
     let configs = configsParser.parse(
       JSON.parse(storage.getItem('configs') || ''),
     )
-    return configs.sort((a, b) => compare(a.profile_name, b.profile_name))
+    return configs.sort(
+      (a, b) =>
+        compare(b.last_applied || 0, a.last_applied || 0) ||
+        compare(a.profile_name, b.profile_name),
+    )
   } catch (error) {
     return []
   }
@@ -71,4 +77,15 @@ export function applyConfig(config: Config) {
   config.screens.forEach(({ name, w, h, x, y }) => {
     execSync(`xrandr --output ${name} --mode ${w}x${h} --pos ${x}x${y}`)
   })
+
+  // update last_applied
+  config.last_applied = Date.now()
+  let configs = loadConfigs()
+  let index = configs.findIndex(c => c.profile_name == config.profile_name)
+  if (index == -1) {
+    configs.push(config)
+  } else {
+    configs[index] = config
+  }
+  saveConfigs(configs)
 }
