@@ -47,7 +47,7 @@ export function getCurrentConfig(): Config {
     let screen = screenParser.parse({ name, w, h, x, y })
     screens.push(screen)
   }
-  return { profile_name: 'current', screens }
+  return { profile_name: 'current', screens, last_applied: Date.now() }
 }
 
 let storage = getLocalStorage(storageDir)
@@ -59,7 +59,7 @@ export function loadConfigs(): Configs {
     )
     return configs.sort(
       (a, b) =>
-        compare(b.last_applied || 0, a.last_applied || 0) ||
+        compare(b.last_applied ?? -Infinity, a.last_applied ?? -Infinity) ||
         compare(a.profile_name, b.profile_name),
     )
   } catch (error) {
