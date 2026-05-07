@@ -1,5 +1,6 @@
 import { button, div, fragment, h1, h2, h3, h4, input, p } from 'dom-proxy'
 import type { Config, Configs } from '../core.js'
+import { format_2_digit, format_datetime } from '@beenotung/tslib/format.js'
 
 let configList = div()
 let configListMessage = p()
@@ -29,6 +30,17 @@ function ConfigNode(config: Config) {
   })
   let scale = 1 / 10
   let applyMessage = p()
+  function formatTimestamp() {
+    if (!config.last_applied) return '-'
+    let date = new Date(config.last_applied)
+    let y = date.getFullYear()
+    let m = format_2_digit(date.getMonth() + 1)
+    let d = format_2_digit(date.getDate())
+    let H = format_2_digit(date.getHours())
+    let M = format_2_digit(date.getMinutes())
+    let S = format_2_digit(date.getSeconds())
+    return `${y}-${m}-${d} ${H}:${M}:${S}`
+  }
   return div(
     {
       style: {
@@ -44,7 +56,7 @@ function ConfigNode(config: Config) {
           textContent: 'Profile: ',
           style: {
             marginTop: '0.5rem',
-            marginBottom: '0.5rem',
+            marginBottom: '0.25rem',
           },
         },
         [
@@ -57,6 +69,10 @@ function ConfigNode(config: Config) {
           }),
         ],
       ),
+      p({ style: { margin: '0.5rem 0', color: '#666' } }, [
+        'Last used: ',
+        formatTimestamp(),
+      ]),
       div({}, [
         button({
           textContent: 'Save',
