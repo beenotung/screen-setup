@@ -1,9 +1,24 @@
-import { button, div, fragment, h1, h2, h3, h4, input, p } from 'dom-proxy'
+import {
+  button,
+  span,
+  div,
+  fragment,
+  h1,
+  h2,
+  h3,
+  h4,
+  input,
+  label,
+  p,
+  select,
+  option,
+} from 'dom-proxy'
 import type { Config, Configs } from '../core.js'
 import { format_2_digit, format_datetime } from '@beenotung/tslib/format.js'
 
 let configList = div()
-let configListMessage = p()
+let configListMessage = span({ style: { marginInlineStart: '0.5rem' } })
+let filterSelect = select()
 
 let configs: Config[] | undefined
 
@@ -161,9 +176,37 @@ function ConfigNode(config: Config) {
 }
 
 function showConfigs(configs: Config[]) {
-  configListMessage.textContent = configs.length + ' saved configs'
+  let filtered = configs
+  let filterValue = filterSelect.value
+  if (filterValue) {
+    filtered = configs.filter(c =>
+      c.screens.some(s => `${s.w}x${s.h}` === filterValue),
+    )
+  }
+  configListMessage.textContent = `Showing ${filtered.length} of ${configs.length} configs`
   configList.textContent = ''
-  configList.appendChild(fragment(configs.map(ConfigNode)))
+  configList.appendChild(fragment(filtered.map(ConfigNode)))
+}
+
+function updateFilterOptions(configs: Config[]) {
+  let sizes = new Set<string>()
+  for (let config of configs) {
+    for (let screen of config.screens) {
+      if (screen.name.includes('HDMI')) {
+        sizes.add(`${screen.w}x${screen.h}`)
+      }
+    }
+  }
+  let savedValue =
+    localStorage.getItem('screen-setup-filter') || filterSelect.value
+  filterSelect.textContent = ''
+  filterSelect.appendChild(option({ value: '', textContent: 'Show all' }).node)
+  for (let size of Array.from(sizes).sort()) {
+    filterSelect.appendChild(option({ value: size, textContent: size }).node)
+  }
+  if (savedValue && Array.from(sizes).includes(savedValue)) {
+    filterSelect.value = savedValue
+  }
 }
 
 async function loadConfigList() {
@@ -171,12 +214,18 @@ async function loadConfigList() {
     let res = await fetch('/configs')
     let json = (await res.json()) as { configs: Configs }
     configs = json.configs
+    updateFilterOptions(configs)
     showConfigs(configs)
   } catch (error) {
     configList.textContent = String(error)
   }
 }
 loadConfigList()
+
+filterSelect.onchange = () => {
+  if (configs) showConfigs(configs)
+  localStorage.setItem('screen-setup-filter', filterSelect.value)
+}
 
 async function loadCurrentConfig() {
   try {
@@ -185,9 +234,9 @@ async function loadCurrentConfig() {
     }
     let res = await fetch('/current-config')
     let json = (await res.json()) as { config: Config }
-    configs.push(json.config)
-    configListMessage.textContent = configs.length + ' saved configs'
-    configList.prepend(ConfigNode(json.config).node)
+    configs.unshift(json.config)
+    updateFilterOptions(configs)
+    showConfigs(configs)
   } catch (error) {
     configList.textContent = String(error)
   }
@@ -230,12 +279,17 @@ document.body.appendChild(
     h2({ textContent: 'Config List' }, [
       button({
         style: { marginInlineStart: '0.5rem' },
+        textContent: 'Load Current Config',
+        onclick: loadCurrentConfig,
+      }),
+      button({
+        style: { marginInlineStart: '0.5rem' },
         textContent: 'Save Configs',
         onclick: saveConfigs,
       }),
     ]),
     saveMessage,
-    button({ textContent: 'Load Current Config', onclick: loadCurrentConfig }),
+    label(['Filter: ', filterSelect]),
     configListMessage,
     configList,
   ]),
