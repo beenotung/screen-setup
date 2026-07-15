@@ -13,7 +13,7 @@ import {
   select,
   option,
 } from 'dom-proxy'
-import type { Config, Configs } from '../core.js'
+import type { Config, Configs, Screen } from '../core.js'
 import { format_2_digit, format_datetime } from '@beenotung/tslib/format.js'
 
 let configList = div()
@@ -33,6 +33,52 @@ async function applyConfig(config: Config, applyMessage: HTMLParagraphElement) {
     applyMessage.textContent = `Applied config (${new Date().toLocaleTimeString()})`
   } catch (error) {
     applyMessage.textContent = String(error)
+  }
+}
+
+function NumberInput(screen: Screen, key: 'x' | 'y') {
+  return input({
+    style: { width: '4ch' },
+    type: 'text',
+    inputMode: 'numeric',
+    value: String(screen[key]),
+    onchange: e => {
+      let input = e.currentTarget as HTMLInputElement
+      let value = calc(input.value)
+      Object.assign(screen, { [key]: value })
+      input.value = String(value)
+    },
+  })
+}
+
+function calc(text: string): number {
+  let value = +text
+  if (Number.isFinite(value)) {
+    return value
+  }
+
+  let parts = text.split('+')
+  if (parts.length === 2) {
+    value = +parts[0] + +parts[1]
+    if (Number.isFinite(value)) {
+      return value
+    }
+    reject()
+  }
+
+  parts = text.split('-')
+  if (parts.length === 2) {
+    value = +parts[0] - +parts[1]
+    if (Number.isFinite(value)) {
+      return value
+    }
+    reject()
+  }
+
+  reject()
+
+  function reject(): never {
+    throw new Error('Invalid expression: ' + JSON.stringify(text))
   }
 }
 
@@ -112,7 +158,8 @@ function ConfigNode(config: Config) {
           },
         }),
       ]),
-      ...config.screens.map(({ name, w, h, x, y }) => {
+      ...config.screens.map(screen => {
+        let { name, w, h } = screen
         return div(
           {
             style: {
@@ -128,7 +175,12 @@ function ConfigNode(config: Config) {
               textContent: 'Screen: ' + name,
               style: { margin: '0.5rem 0' },
             }),
-            div({ textContent: `${w}x${h}+${x}+${y}` }),
+            div([
+              `${w}x${h}+`,
+              NumberInput(screen, 'x'),
+              '+',
+              NumberInput(screen, 'y'),
+            ]),
           ],
         )
       }),
